@@ -1,0 +1,31 @@
+---
+- name: Install Terraform
+  hosts: localhost
+  become: true
+
+  tasks:
+    - name: Download Terraform package
+      get_url:
+        url: https://releases.hashicorp.com/terraform/{{ terraform_version }}/terraform_{{ terraform_version }}_linux_amd64.zip
+        dest: /tmp/terraform.zip
+      vars:
+        terraform_version: 0.17.0
+
+    - name: Unzip Terraform package
+      unarchive:
+        src: /tmp/terraform.zip
+        dest: /usr/local/bin
+        remote_src: true
+
+    - name: Set execute permissions on Terraform binary
+      file:
+        path: /usr/local/bin/terraform
+        mode: 0755
+
+    - name: Check Terraform version
+      command: terraform --version
+      register: terraform_version
+
+    - name: Display Terraform version
+      debug:
+        var: terraform_version
